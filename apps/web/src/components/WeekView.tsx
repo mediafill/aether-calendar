@@ -1,5 +1,5 @@
 import { useCalendarStore } from '../stores/calendar';
-import type { Event } from '@aether/shared-types';
+import type { Event } from '../types/shared';
 
 interface WeekViewProps {
   events: Event[];

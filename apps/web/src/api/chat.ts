@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ChatMessage, ChatResponse } from '@aether/shared-types';
+import type { ChatMessage, ChatResponse } from '../types/shared';
 
 export const chatApi = {
   sendMessage: (message: string): Promise<ChatResponse> =>

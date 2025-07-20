@@ -1,7 +1,7 @@
 import { groupBy } from 'lodash';
 import { useCalendarStore } from '../stores/calendar';
 import EventCard from './EventCard';
-import type { Event } from '@aether/shared-types';
+import type { Event } from '../types/shared';
 
 interface AgendaViewProps {
   events: Event[];

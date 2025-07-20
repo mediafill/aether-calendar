@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { AuthResponse } from '@aether/shared-types';
+import type { AuthResponse } from '../types/shared';
 
 export const authApi = {
   googleAuth: (code: string): Promise<AuthResponse> =>

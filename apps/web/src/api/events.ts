@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Event, EventCreateRequest, EventUpdateRequest } from '@aether/shared-types';
+import type { Event, EventCreateRequest, EventUpdateRequest } from '../types/shared';
 
 export const eventsApi = {
   getEvents: (startDate: string, endDate: string): Promise<Event[]> =>

@@ -1,4 +1,4 @@
-import type { Event } from '@aether/shared-types';
+import type { Event } from '../types/shared';
 
 interface EventCardProps {
   event: Event;
