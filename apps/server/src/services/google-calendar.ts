@@ -2,6 +2,20 @@ import { google } from 'googleapis';
 import type { EventCreateRequest, EventUpdateRequest } from '@aether/shared-types';
 
 class GoogleCalendarService {
+  private isDevMode = process.env.DISABLE_GOOGLE_APIS === 'true';
+
+  private generateMockEvent(data?: Partial<any>) {
+    return {
+      id: `mock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: data?.title || data?.summary || 'Mock Event',
+      start: data?.start?.dateTime || data?.start || new Date().toISOString(),
+      end: data?.end?.dateTime || data?.end || new Date(Date.now() + 3600000).toISOString(),
+      description: data?.description || 'This is a mock event for development',
+      location: data?.location || '',
+      guests: data?.attendees?.map((a: any) => a.email) || [],
+      googleEventId: `mock-${Date.now()}`,
+    };
+  }
   private getCalendarClient(accessToken: string) {
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({ access_token: accessToken });
@@ -9,6 +23,31 @@ class GoogleCalendarService {
   }
 
   async getEvents(accessToken: string, startDate: string, endDate: string) {
+    if (this.isDevMode) {
+      // Return mock events for development
+      return [
+        this.generateMockEvent({
+          title: 'Team Meeting',
+          start: new Date().toISOString(),
+          end: new Date(Date.now() + 3600000).toISOString(),
+          description: 'Weekly team sync meeting',
+          location: 'Conference Room A',
+        }),
+        this.generateMockEvent({
+          title: 'Project Review',
+          start: new Date(Date.now() + 86400000).toISOString(),
+          end: new Date(Date.now() + 86400000 + 7200000).toISOString(),
+          description: 'Review project progress and next steps',
+        }),
+        this.generateMockEvent({
+          title: 'Lunch with Client',
+          start: new Date(Date.now() + 172800000).toISOString(),
+          end: new Date(Date.now() + 172800000 + 3600000).toISOString(),
+          location: 'Downtown Restaurant',
+        }),
+      ];
+    }
+
     const calendar = this.getCalendarClient(accessToken);
 
     const response = await calendar.events.list({
@@ -32,6 +71,11 @@ class GoogleCalendarService {
   }
 
   async createEvent(accessToken: string, eventData: EventCreateRequest) {
+    if (this.isDevMode) {
+      // Return mock created event for development
+      return this.generateMockEvent(eventData);
+    }
+
     const calendar = this.getCalendarClient(accessToken);
 
     const event = {
@@ -68,6 +112,11 @@ class GoogleCalendarService {
   }
 
   async updateEvent(accessToken: string, eventId: string, eventData: EventUpdateRequest) {
+    if (this.isDevMode) {
+      // Return mock updated event for development
+      return this.generateMockEvent({ ...eventData, id: eventId });
+    }
+
     const calendar = this.getCalendarClient(accessToken);
 
     const updateData: any = {};
@@ -111,6 +160,12 @@ class GoogleCalendarService {
   }
 
   async deleteEvent(accessToken: string, eventId: string) {
+    if (this.isDevMode) {
+      // Mock deletion for development
+      console.log(`Mock: Deleted event ${eventId}`);
+      return;
+    }
+
     const calendar = this.getCalendarClient(accessToken);
     await calendar.events.delete({
       calendarId: 'primary',

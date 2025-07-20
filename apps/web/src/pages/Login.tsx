@@ -33,11 +33,29 @@ function Login() {
   };
 
   const handleGoogleLogin = () => {
+    // Development mode: skip Google OAuth
+    if (import.meta.env.DEV || GOOGLE_CLIENT_ID === 'disabled-for-development') {
+      handleDevLogin();
+      return;
+    }
+
     const redirectUri = `${window.location.origin}/auth/callback`;
     const scope = 'openid email profile https://www.googleapis.com/auth/calendar';
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
     
     window.location.href = authUrl;
+  };
+
+  const handleDevLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await authApi.googleAuth('dev-mode');
+      setAuth(response.user, response.token);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Development login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {

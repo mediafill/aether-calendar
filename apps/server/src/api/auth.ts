@@ -17,9 +17,47 @@ const googleAuth = new GoogleAuth({
 authRouter.post('/google', async (req, res) => {
   try {
     const { code } = req.body;
+    const isDevMode = process.env.DISABLE_GOOGLE_APIS === 'true';
 
-    if (!code) {
+    if (!code && !isDevMode) {
       return res.status(400).json({ error: 'Authorization code is required' });
+    }
+
+    // Development mode: create mock user
+    if (isDevMode) {
+      const mockUser = await prisma.user.upsert({
+        where: { email: 'dev@aethercalendar.com' },
+        update: {},
+        create: {
+          googleId: 'dev-google-id',
+          email: 'dev@aethercalendar.com',
+          name: 'Development User',
+          picture: 'https://via.placeholder.com/150',
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token',
+        },
+      });
+
+      const token = jwt.sign(
+        { userId: mockUser.id, email: mockUser.email },
+        authConfig.jwtSecret,
+        { expiresIn: '7d' }
+      );
+
+      const response: AuthResponse = {
+        token,
+        user: {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.name,
+          picture: mockUser.picture || undefined,
+          googleId: mockUser.googleId,
+          createdAt: mockUser.createdAt,
+          updatedAt: mockUser.updatedAt,
+        },
+      };
+
+      return res.json(response);
     }
 
     const oauth2Client = new googleAuth.OAuth2Client(
