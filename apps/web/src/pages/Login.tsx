@@ -4,7 +4,8 @@ import { useAuthStore } from '../stores/auth';
 import { authApi } from '../api/auth';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const isDevelopmentMode = GOOGLE_CLIENT_ID === 'disabled-for-development' || import.meta.env.DEV;
+// Force development mode when environment variable is set, regardless of DEV flag
+const isDevelopmentMode = GOOGLE_CLIENT_ID === 'disabled-for-development';
 
 // Debug logging
 console.log('Environment check:', {

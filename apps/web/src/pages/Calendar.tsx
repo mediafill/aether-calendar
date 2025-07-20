@@ -42,8 +42,8 @@ function Calendar() {
     queryKey: ['events', startDate, endDate],
     queryFn: () => eventsApi.getEvents(startDate, endDate),
     retry: false,
-    // Add mock events fallback for development
-    initialData: import.meta.env.DEV ? [
+    // Add mock events fallback for testing (when API is disabled)
+    initialData: import.meta.env.VITE_GOOGLE_CLIENT_ID === 'disabled-for-development' ? [
       {
         id: 'mock-1',
         title: 'Team Meeting',
