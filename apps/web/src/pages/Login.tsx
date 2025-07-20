@@ -4,6 +4,15 @@ import { useAuthStore } from '../stores/auth';
 import { authApi } from '../api/auth';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const isDevelopmentMode = GOOGLE_CLIENT_ID === 'disabled-for-development' || import.meta.env.DEV;
+
+// Debug logging
+console.log('Environment check:', {
+  GOOGLE_CLIENT_ID,
+  isDEV: import.meta.env.DEV,
+  isDevelopmentMode,
+  allEnv: import.meta.env
+});
 
 function Login() {
   const location = useLocation();
@@ -34,7 +43,7 @@ function Login() {
 
   const handleGoogleLogin = () => {
     // Development mode: skip Google OAuth
-    if (import.meta.env.DEV || GOOGLE_CLIENT_ID === 'disabled-for-development') {
+    if (isDevelopmentMode) {
       handleDevLogin();
       return;
     }
@@ -91,7 +100,7 @@ function Login() {
         <div className="login-header">
           <h1>Welcome to Aether Calendar</h1>
           <p>Your intelligent calendar assistant</p>
-          {(import.meta.env.DEV || GOOGLE_CLIENT_ID === 'disabled-for-development') && (
+          {isDevelopmentMode && (
             <div style={{
               background: '#e8f5e8',
               color: '#2e7d2e',
@@ -112,7 +121,7 @@ function Login() {
           </div>
         )}
 
-        {(import.meta.env.DEV || GOOGLE_CLIENT_ID === 'disabled-for-development') ? (
+        {isDevelopmentMode ? (
           <button
             className="btn btn-primary google-login-btn"
             onClick={handleDevLogin}
