@@ -17,7 +17,7 @@ function EventModal({ isOpen, onClose, onSave, onDelete, event, selectedDate }: 
     location: '',
     start: '',
     end: '',
-    importance: 'medium' as const,
+    importance: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
     guests: [] as string[],
     tags: [] as string[]
   });

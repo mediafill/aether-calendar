@@ -9,7 +9,7 @@ import MonthView from '../components/MonthView';
 import WeekView from '../components/WeekView';
 import AetherChat from '../components/AetherChat';
 import EventModal from '../components/EventModal';
-import type { Event } from '../types/shared';
+import type { Event, EventCreateRequest } from '../types/shared';
 
 function Calendar() {
   const { user, logout } = useAuthStore();
@@ -50,7 +50,7 @@ function Calendar() {
 
   // Mutations for event operations
   const createEventMutation = useMutation({
-    mutationFn: (eventData: Partial<Event>) => eventsApi.createEvent(eventData),
+    mutationFn: (eventData: EventCreateRequest) => eventsApi.createEvent(eventData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
@@ -149,8 +149,19 @@ function Calendar() {
       // Update existing event
       updateEventMutation.mutate({ id: eventModal.event.id, ...eventData });
     } else {
-      // Create new event
-      createEventMutation.mutate(eventData);
+      // Create new event - ensure required fields are present
+      const createData: EventCreateRequest = {
+        title: eventData.title || '',
+        start: eventData.start || new Date().toISOString(),
+        end: eventData.end || new Date().toISOString(),
+        description: eventData.description,
+        location: eventData.location,
+        guests: eventData.guests,
+        importance: eventData.importance,
+        tags: eventData.tags,
+        nagDate: eventData.nagDate
+      };
+      createEventMutation.mutate(createData);
     }
   };
 

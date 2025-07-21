@@ -102,7 +102,6 @@ function WeekView({ events, onEventClick, onDateClick }: WeekViewProps) {
                     const eventStart = new Date(event.start);
                     const eventEnd = new Date(event.end);
                     const startHour = eventStart.getHours();
-                    const endHour = eventEnd.getHours();
                     const durationHours = eventEnd.getTime() - eventStart.getTime();
                     const durationPixels = (durationHours / (1000 * 60 * 60)) * 60;
                     

@@ -1,6 +1,5 @@
 import { groupBy } from 'lodash';
 import { useCalendarStore } from '../stores/calendar';
-import EventCard from './EventCard';
 import type { Event } from '../types/shared';
 
 interface AgendaViewProps {
@@ -72,7 +71,6 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
                   .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
                   .map((event) => {
                     const eventStart = new Date(event.start);
-                    const eventEnd = new Date(event.end);
                     
                     return (
                       <div 
