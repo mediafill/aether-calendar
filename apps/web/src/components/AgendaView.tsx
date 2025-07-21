@@ -38,7 +38,7 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
 
   const days = getDaysInRange();
 
-  const handleTouchStart = (e: React.TouchEvent, eventId: string) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartTime.current = Date.now();
   };
@@ -120,7 +120,7 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
                         key={event.id} 
                         className={`agenda-event ${swipedEvent === event.id ? 'swiped' : ''}`}
                         onClick={() => onEventClick?.(event)}
-                        onTouchStart={(e) => handleTouchStart(e, event.id)}
+                        onTouchStart={(e) => handleTouchStart(e)}
                         onTouchEnd={(e) => handleTouchEnd(e, event)}
                         style={{
                           transform: swipedEvent === event.id ? 'translateX(-100%)' : 'translateX(0)',
