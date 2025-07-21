@@ -142,7 +142,7 @@ function EventModal({ isOpen, onClose, onSave, onDelete, event, selectedDate }: 
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{event ? 'Edit Event' : 'Create New Event'}</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close modal">×</button>
         </div>
 
         {errors.length > 0 && (
@@ -166,6 +166,8 @@ function EventModal({ isOpen, onClose, onSave, onDelete, event, selectedDate }: 
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter event title"
+                  autoComplete="off"
+                  autoFocus={!event}
                   required
                 />
               </div>

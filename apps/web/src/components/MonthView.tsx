@@ -73,7 +73,7 @@ function MonthView({ events, onEventClick, onDateClick }: MonthViewProps) {
               </div>
               
               <div className="day-events">
-                {dayEvents.slice(0, 3).map(event => (
+                {dayEvents.slice(0, 2).map(event => (
                   <div
                     key={event.id}
                     className="day-event"
@@ -94,16 +94,31 @@ function MonthView({ events, onEventClick, onDateClick }: MonthViewProps) {
                       onEventClick?.(event);
                     }}
                   >
-                    {event.title}
+                    <span className="event-title">{event.title}</span>
+                    <span className="event-time">
+                      {new Date(event.start).toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit',
+                        hour12: true 
+                      }).replace(/\s?(AM|PM)/, '$1')}
+                    </span>
                   </div>
                 ))}
                 
-                {dayEvents.length > 3 && (
+                {dayEvents.length > 2 && (
                   <div
-                    className="day-event"
-                    style={{ backgroundColor: '#5f6368', fontSize: '11px' }}
+                    className="day-event more-events"
+                    style={{ 
+                      backgroundColor: '#5f6368', 
+                      cursor: 'pointer'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Show all events for this day
+                      alert(`All events for ${date.toLocaleDateString()}:\n${dayEvents.map(e => `• ${e.title}`).join('\n')}`);
+                    }}
                   >
-                    +{dayEvents.length - 3} more
+                    +{dayEvents.length - 2} more
                   </div>
                 )}
               </div>

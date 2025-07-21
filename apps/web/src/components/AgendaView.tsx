@@ -1,3 +1,4 @@
+import React, { useState, useRef } from 'react';
 import { groupBy } from 'lodash';
 import { useCalendarStore } from '../stores/calendar';
 import type { Event } from '../types/shared';
@@ -10,6 +11,9 @@ interface AgendaViewProps {
 
 function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
   const { currentDate } = useCalendarStore();
+  const [swipedEvent, setSwipedEvent] = useState<string | null>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartTime = useRef<number>(0);
 
   const getDaysInRange = () => {
     const days = [];
@@ -33,6 +37,45 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
   );
 
   const days = getDaysInRange();
+
+  const handleTouchStart = (e: React.TouchEvent, eventId: string) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartTime.current = Date.now();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, event: Event) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndTime = Date.now();
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaTime = touchEndTime - touchStartTime.current;
+
+    // Only process swipes that are fast and significant
+    if (Math.abs(deltaX) > 50 && deltaTime < 300) {
+      if (deltaX > 0) {
+        // Swipe right - Complete event
+        handleCompleteEvent(event);
+      } else {
+        // Swipe left - Snooze event
+        handleSnoozeEvent(event);
+      }
+    }
+  };
+
+  const handleCompleteEvent = (event: Event) => {
+    setSwipedEvent(event.id);
+    setTimeout(() => {
+      alert(`✅ "${event.title}" marked as complete!`);
+      setSwipedEvent(null);
+    }, 300);
+  };
+
+  const handleSnoozeEvent = (event: Event) => {
+    setSwipedEvent(event.id);
+    setTimeout(() => {
+      alert(`😴 "${event.title}" snoozed for 15 minutes.`);
+      setSwipedEvent(null);
+    }, 300);
+  };
 
   return (
     <div className="agenda-view">
@@ -75,8 +118,15 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
                     return (
                       <div 
                         key={event.id} 
-                        className="agenda-event"
+                        className={`agenda-event ${swipedEvent === event.id ? 'swiped' : ''}`}
                         onClick={() => onEventClick?.(event)}
+                        onTouchStart={(e) => handleTouchStart(e, event.id)}
+                        onTouchEnd={(e) => handleTouchEnd(e, event)}
+                        style={{
+                          transform: swipedEvent === event.id ? 'translateX(-100%)' : 'translateX(0)',
+                          transition: 'transform 0.3s ease',
+                          position: 'relative'
+                        }}
                       >
                         <div 
                           className={`agenda-importance ${event.importance || 'medium'}`}
@@ -126,6 +176,12 @@ function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
           >
             Create New Event
           </button>
+        </div>
+      )}
+
+      {events.length > 0 && (
+        <div className="agenda-help">
+          <p>💡 <strong>Mobile tip:</strong> Swipe right to complete, left to snooze events</p>
         </div>
       )}
     </div>

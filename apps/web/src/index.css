@@ -737,6 +737,28 @@ body {
 .agenda-importance.medium { background: #34a853; }
 .agenda-importance.low { background: #9aa0a6; }
 
+.agenda-help {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 12px 16px;
+  margin: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  border: 1px solid #bbdefb;
+}
+
+.agenda-event {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  overflow: hidden;
+}
+
+.agenda-event.swiped {
+  opacity: 0.7;
+}
+
 /* Event Creation */
 .create-event-btn {
   position: fixed;
@@ -784,71 +806,520 @@ body {
   margin-bottom: 24px;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95vw;
-    margin: 20px;
+/* Base styles - Mobile First */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Touch-friendly sizing */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Mobile-first responsive design */
+.container {
+  padding: 0 12px;
+}
+
+/* Header mobile optimization */
+.header {
+  padding: 0.75rem 0;
+}
+
+.header-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 20px;
+}
+
+.user-menu {
+  font-size: 14px;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+}
+
+/* Calendar Header Mobile */
+.calendar-header {
+  margin-bottom: 16px;
+  padding: 16px 12px;
+}
+
+.calendar-header > div:first-child {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.calendar-header h2 {
+  font-size: 20px;
+}
+
+.calendar-views {
+  width: 100%;
+  justify-content: center;
+}
+
+.view-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+/* Month View Mobile */
+.calendar-day {
+  min-height: 60px;
+  padding: 4px 2px;
+}
+
+.day-number {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.calendar-day.today .day-number {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+}
+
+.day-event {
+  font-size: 9px;
+  padding: 2px 4px;
+  margin-bottom: 1px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  min-height: 16px;
+  justify-content: center;
+}
+
+.event-title {
+  font-weight: 600;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-time {
+  font-size: 8px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.day-event.more-events {
+  text-align: center;
+  font-weight: 500;
+}
+
+.day-events {
+  gap: 1px;
+}
+
+/* Week View Mobile */
+.week-header-row,
+.week-grid {
+  grid-template-columns: 50px repeat(7, 1fr);
+}
+
+.time-column,
+.time-slot {
+  padding: 8px 4px;
+  font-size: 10px;
+}
+
+.week-day-header {
+  padding: 8px 4px;
+}
+
+.week-day-name {
+  font-size: 10px;
+}
+
+.week-day-number {
+  font-size: 14px;
+}
+
+.week-day-header.today .week-day-number {
+  width: 24px;
+  height: 24px;
+}
+
+.week-grid {
+  min-height: 300px;
+}
+
+.week-event {
+  font-size: 10px;
+  padding: 2px 4px;
+  left: 2px;
+  right: 2px;
+}
+
+/* Agenda View Mobile */
+.agenda-date {
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.agenda-event {
+  padding: 12px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.agenda-importance {
+  width: 100%;
+  height: 3px;
+  margin: 0 0 8px 0;
+}
+
+.agenda-time {
+  min-width: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4285f4;
+}
+
+.agenda-content {
+  margin-left: 0;
+  width: 100%;
+}
+
+.agenda-title {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.agenda-details {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Modal Mobile */
+.modal-overlay {
+  padding: 4px;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.modal-content {
+  width: calc(100% - 8px);
+  max-width: none;
+  margin: 0;
+  max-height: calc(100vh - 40px);
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header {
+  padding: 16px;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+}
+
+.modal-body {
+  padding: 16px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.form-grid {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+.modal-footer {
+  flex-direction: column-reverse;
+  gap: 8px;
+  padding: 16px;
+}
+
+.modal-actions-left,
+.modal-actions-right {
+  width: 100%;
+  justify-content: center;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-actions-right .btn {
+  flex: 1;
+}
+
+/* FAB Mobile */
+.fab {
+  width: 56px;
+  height: 56px;
+  bottom: 20px;
+  right: 20px;
+  font-size: 20px;
+}
+
+.create-event-btn {
+  width: 48px;
+  height: 48px;
+  bottom: 84px;
+  right: 20px;
+  font-size: 20px;
+}
+
+/* Empty State Mobile */
+.empty-state {
+  padding: 40px 20px;
+}
+
+.empty-state-icon {
+  font-size: 36px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* Chat Mobile */
+.chat-container {
+  width: 100%;
+  height: 100vh;
+  bottom: 0;
+  right: 0;
+  border-radius: 0;
+  position: fixed;
+}
+
+.chat-header {
+  border-radius: 0;
+}
+
+/* Login Mobile */
+.login-card {
+  padding: 32px 24px;
+  margin: 16px;
+}
+
+.login-header h1 {
+  font-size: 24px;
+}
+
+.google-login-btn {
+  font-size: 14px;
+  padding: 12px 16px;
+}
+
+/* Tablet and larger styles */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 16px;
   }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
+
+  .header {
+    padding: 1rem 0;
   }
-  
-  .modal-footer {
-    flex-direction: column-reverse;
-    gap: 12px;
+
+  .logo {
+    font-size: 24px;
   }
-  
-  .modal-actions-left,
-  .modal-actions-right {
-    width: 100%;
-    justify-content: center;
+
+  .user-menu {
+    font-size: 16px;
+    gap: 16px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
   }
 
   .calendar-header {
-    padding: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
   }
-  
+
   .calendar-header > div:first-child {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
-  
+
+  .calendar-header h2 {
+    font-size: 28px;
+  }
+
+  .calendar-views {
+    width: auto;
+  }
+
+  .view-btn {
+    flex: none;
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+
   .calendar-day {
-    min-height: 80px;
-    padding: 4px;
+    min-height: 120px;
+    padding: 8px;
   }
-  
+
   .day-number {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .calendar-day.today .day-number {
+    width: 24px;
+    height: 24px;
     font-size: 12px;
   }
-  
+
   .day-event {
-    font-size: 10px;
-    padding: 1px 4px;
+    font-size: 11px;
+    padding: 2px 6px;
+    margin-bottom: 2px;
   }
-  
-  .week-grid {
-    min-height: 400px;
+
+  .day-events {
+    gap: 2px;
   }
-  
+
   .week-header-row,
   .week-grid {
-    grid-template-columns: 60px repeat(7, 1fr);
+    grid-template-columns: 80px repeat(7, 1fr);
   }
-  
-  .agenda-event {
-    padding: 12px 16px;
-  }
-  
-  .agenda-time {
-    min-width: 60px;
+
+  .time-column,
+  .time-slot {
+    padding: 8px;
     font-size: 12px;
   }
-  
+
+  .week-day-header {
+    padding: 16px 8px;
+  }
+
+  .week-day-name {
+    font-size: 12px;
+  }
+
+  .week-day-number {
+    font-size: 18px;
+  }
+
+  .week-day-header.today .week-day-number {
+    width: 32px;
+    height: 32px;
+  }
+
+  .week-grid {
+    min-height: 600px;
+  }
+
+  .week-event {
+    font-size: 12px;
+    padding: 4px 8px;
+    left: 4px;
+    right: 4px;
+  }
+
+  .agenda-event {
+    padding: 16px 24px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .agenda-importance {
+    width: 4px;
+    height: 40px;
+    margin: 0 16px 0 0;
+  }
+
+  .agenda-time {
+    min-width: 80px;
+    font-size: 14px;
+  }
+
   .agenda-content {
-    margin-left: 12px;
+    margin-left: 16px;
+  }
+
+  .modal-content {
+    width: 90vw;
+    max-width: 600px;
+    margin: 20px auto;
+    max-height: 90vh;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .modal-footer {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .modal-actions-left,
+  .modal-actions-right {
+    width: auto;
+  }
+
+  .modal-actions-right .btn {
+    flex: none;
+  }
+
+  .chat-container {
+    width: 350px;
+    height: 500px;
+    bottom: 24px;
+    right: 24px;
+    border-radius: 16px;
+  }
+
+  .chat-header {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .login-card {
+    padding: 48px;
+    max-width: 400px;
+  }
+
+  .login-header h1 {
+    font-size: 32px;
   }
 }
