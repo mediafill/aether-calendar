@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCalendarStore } from '../stores/calendar';
 import { useAuthStore } from '../stores/auth';
 import { eventsApi } from '../api/events';
+import { Event } from '../types/shared';
 import CalendarHeader from '../components/CalendarHeader';
 import AgendaView from '../components/AgendaView';
 import MonthView from '../components/MonthView';
@@ -13,6 +14,8 @@ function Calendar() {
   const { user, logout } = useAuthStore();
   const { currentDate, view } = useCalendarStore();
   const [showChat, setShowChat] = useState(false);
+  
+  const queryClient = useQueryClient();
 
   const getDateRange = () => {
     const start = new Date(currentDate);
@@ -37,6 +40,7 @@ function Calendar() {
   };
 
   const { startDate, endDate } = getDateRange();
+
 
   const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['events', startDate, endDate],
