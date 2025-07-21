@@ -3,9 +3,11 @@ import type { Event } from '../types/shared';
 
 interface MonthViewProps {
   events: Event[];
+  onEventClick?: (event: Event) => void;
+  onDateClick?: (date: Date) => void;
 }
 
-function MonthView({ events }: MonthViewProps) {
+function MonthView({ events, onEventClick, onDateClick }: MonthViewProps) {
   const { currentDate } = useCalendarStore();
 
   const getDaysInMonth = () => {
@@ -64,6 +66,7 @@ function MonthView({ events }: MonthViewProps) {
             <div
               key={index}
               className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`}
+              onClick={() => onDateClick?.(date)}
             >
               <div className="day-number">
                 {date.getDate()}
@@ -86,6 +89,10 @@ function MonthView({ events }: MonthViewProps) {
                       })(),
                     }}
                     title={`${event.title} - ${new Date(event.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEventClick?.(event);
+                    }}
                   >
                     {event.title}
                   </div>

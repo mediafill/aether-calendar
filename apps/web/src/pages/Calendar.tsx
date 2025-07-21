@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCalendarStore } from '../stores/calendar';
 import { useAuthStore } from '../stores/auth';
 import { eventsApi } from '../api/events';
@@ -8,11 +8,20 @@ import AgendaView from '../components/AgendaView';
 import MonthView from '../components/MonthView';
 import WeekView from '../components/WeekView';
 import AetherChat from '../components/AetherChat';
+import EventModal from '../components/EventModal';
+import type { Event } from '../types/shared';
 
 function Calendar() {
   const { user, logout } = useAuthStore();
   const { currentDate, view } = useCalendarStore();
   const [showChat, setShowChat] = useState(false);
+  const [eventModal, setEventModal] = useState<{
+    isOpen: boolean;
+    event?: Event | null;
+    selectedDate?: Date;
+  }>({ isOpen: false });
+
+  const queryClient = useQueryClient();
   
 
   const getDateRange = () => {
@@ -38,6 +47,38 @@ function Calendar() {
   };
 
   const { startDate, endDate } = getDateRange();
+
+  // Mutations for event operations
+  const createEventMutation = useMutation({
+    mutationFn: (eventData: Partial<Event>) => eventsApi.createEvent(eventData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+    onError: (error) => {
+      console.error('Failed to create event:', error);
+    }
+  });
+
+  const updateEventMutation = useMutation({
+    mutationFn: ({ id, ...data }: Partial<Event> & { id: string }) => 
+      eventsApi.updateEvent(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+    onError: (error) => {
+      console.error('Failed to update event:', error);
+    }
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: (eventId: string) => eventsApi.deleteEvent(eventId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+    onError: (error) => {
+      console.error('Failed to delete event:', error);
+    }
+  });
 
 
   const { data: events = [], isLoading, error } = useQuery({
@@ -94,14 +135,54 @@ function Calendar() {
     ] : [],
   });
 
+  // Event handlers
+  const handleCreateEvent = () => {
+    setEventModal({ isOpen: true, selectedDate: new Date() });
+  };
+
+  const handleEditEvent = (event: Event) => {
+    setEventModal({ isOpen: true, event });
+  };
+
+  const handleSaveEvent = (eventData: Partial<Event>) => {
+    if (eventModal.event) {
+      // Update existing event
+      updateEventMutation.mutate({ id: eventModal.event.id, ...eventData });
+    } else {
+      // Create new event
+      createEventMutation.mutate(eventData);
+    }
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    if (confirm('Are you sure you want to delete this event?')) {
+      deleteEventMutation.mutate(eventId);
+      setEventModal({ isOpen: false });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setEventModal({ isOpen: false });
+  };
+
+  const handleDateClick = (date: Date) => {
+    setEventModal({ isOpen: true, selectedDate: date });
+  };
+
   const renderCalendarView = () => {
+    const viewProps = {
+      events,
+      onEventClick: handleEditEvent,
+      onDateClick: handleDateClick
+    };
+
     switch (view) {
       case 'month':
-        return <MonthView events={events} />;
+        return <MonthView {...viewProps} />;
       case 'week':
-        return <WeekView events={events} />;
+        return <WeekView {...viewProps} />;
       default:
-        return <AgendaView events={events} />;
+        return <AgendaView {...viewProps} />;
     }
   };
 
@@ -147,6 +228,16 @@ function Calendar() {
         )}
       </main>
 
+      {!showChat && (
+        <button
+          className="create-event-btn"
+          onClick={handleCreateEvent}
+          title="Create New Event"
+        >
+          +
+        </button>
+      )}
+
       {showChat ? (
         <AetherChat onClose={() => setShowChat(false)} />
       ) : (
@@ -158,6 +249,15 @@ function Calendar() {
           💬
         </button>
       )}
+
+      <EventModal
+        isOpen={eventModal.isOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveEvent}
+        onDelete={handleDeleteEvent}
+        event={eventModal.event}
+        selectedDate={eventModal.selectedDate}
+      />
     </div>
   );
 }

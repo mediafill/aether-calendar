@@ -5,9 +5,11 @@ import type { Event } from '../types/shared';
 
 interface AgendaViewProps {
   events: Event[];
+  onEventClick?: (event: Event) => void;
+  onDateClick?: (date: Date) => void;
 }
 
-function AgendaView({ events }: AgendaViewProps) {
+function AgendaView({ events, onEventClick, onDateClick }: AgendaViewProps) {
   const { currentDate } = useCalendarStore();
 
   const getDaysInRange = () => {
@@ -54,32 +56,78 @@ function AgendaView({ events }: AgendaViewProps) {
               {isToday && ' (Today)'}
             </div>
             
-            {dayEvents.length === 0 ? (
-              <div style={{ 
-                padding: '16px', 
-                color: '#9aa0a6', 
-                fontStyle: 'italic',
-                marginBottom: '24px'
-              }}>
-                No events scheduled
-              </div>
-            ) : (
-              <div style={{ marginBottom: '24px' }}>
-                {dayEvents
+            <div className="agenda-events">
+              {dayEvents.length === 0 ? (
+                <div style={{ 
+                  padding: '24px', 
+                  color: '#9aa0a6', 
+                  fontStyle: 'italic',
+                  textAlign: 'center',
+                  fontSize: '14px'
+                }}>
+                  No events scheduled
+                </div>
+              ) : (
+                dayEvents
                   .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-                  .map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-              </div>
-            )}
+                  .map((event) => {
+                    const eventStart = new Date(event.start);
+                    const eventEnd = new Date(event.end);
+                    
+                    return (
+                      <div 
+                        key={event.id} 
+                        className="agenda-event"
+                        onClick={() => onEventClick?.(event)}
+                      >
+                        <div 
+                          className={`agenda-importance ${event.importance || 'medium'}`}
+                        />
+                        <div className="agenda-time">
+                          {eventStart.toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit',
+                            hour12: true 
+                          })}
+                        </div>
+                        <div className="agenda-content">
+                          <div className="agenda-title">{event.title}</div>
+                          <div className="agenda-details">
+                            {event.description && (
+                              <div style={{ marginBottom: '4px' }}>{event.description}</div>
+                            )}
+                            {event.location && (
+                              <div style={{ color: '#5f6368', fontSize: '12px' }}>
+                                📍 {event.location}
+                              </div>
+                            )}
+                            {event.guests && event.guests.length > 0 && (
+                              <div style={{ color: '#5f6368', fontSize: '12px', marginTop: '4px' }}>
+                                👥 {event.guests.length} guest{event.guests.length > 1 ? 's' : ''}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
           </div>
         );
       })}
 
       {events.length === 0 && (
-        <div className="no-events">
-          No events found for this period.
-          Try asking Aether to schedule something for you!
+        <div className="empty-state">
+          <div className="empty-state-icon">📅</div>
+          <h3>No events scheduled</h3>
+          <p>Your calendar is clear for the next 7 days.<br/>Try asking Aether to schedule something for you!</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => onDateClick?.(new Date())}
+          >
+            Create New Event
+          </button>
         </div>
       )}
     </div>
